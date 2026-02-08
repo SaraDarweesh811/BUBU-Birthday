@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hbd Bubu 🎂</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Tahoma, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #2c5364, #a1c4fd);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.box {
+  background: #f7fbff;
+  width: 340px;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+}
+
+.hidden { display: none; }
+
+h2, h3 {
+  color: #0a3d62;
+}
+
+p {
+  color: #1e3799;
+  line-height: 1.6;
+}
+
+button {
+  background: linear-gradient(135deg, #1e90ff, #0a3d62);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-size: 15px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+img {
+  width: 100%;
+  border-radius: 15px;
+  margin-top: 10px;
+}
+
+canvas {
+  margin-top: 10px;
+  border-radius: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <!-- التايمر -->
+  <div id="timer">
+    <h3>⏳ باقي على يومك</h3>
+    <p id="countdown"></p>
+  </div>
+
+  <!-- المسج -->
+  <div id="birthday" class="hidden">
+    <h2>Hbd bubu 🎂💙</h2>
+    <p>
+      اليوم مش يوم عادي<br>
+      اليوم يومك<br>
+      وكل اللي جاي إلك حب وفرح
+    </p>
+
+    <img src="photo1.jpg">
+    <img src="photo2.jpg">
+
+    <button onclick="startActivities()">نبدأ الفعاليات 👀</button>
+  </div>
+
+  <!-- الفعاليات -->
+  <div id="activity" class="hidden">
+    <h3 id="title"></h3>
+
+    <div style="position:relative">
+      <div id="prize" style="padding:20px;font-size:20px;color:#0a3d62;"></div>
+      <canvas id="scratch" width="260" height="120"></canvas>
+    </div>
+
+    <button id="nextBtn" class="hidden" onclick="nextActivity()">التالي ➡️</button>
+  </div>
+
+</div>
+
+<script>
+const targetDate = new Date("2026-02-23T00:00:00");
+const timer = document.getElementById("timer");
+const birthday = document.getElementById("birthday");
+const countdown = document.getElementById("countdown");
+
+function updateTimer() {
+  const now = new Date();
+  const diff = targetDate - now;
+  if (diff <= 0) {
+    timer.classList.add("hidden");
+    birthday.classList.remove("hidden");
+    return;
+  }
+  const d = Math.floor(diff / (1000*60*60*24));
+  const h = Math.floor((diff / (1000*60*60)) % 24);
+  const m = Math.floor((diff / (1000*60)) % 60);
+  countdown.textContent = ${d} يوم ${h} ساعة ${m} دقيقة;
+}
+setInterval(updateTimer,1000);
+updateTimer();
+
+const activities = [
+  "☕ اليوم رح نفطر سوا 🥐",
+  "🏎️ كارتنج 🔥",
+  "☕ قهوة من Key 💙",
+  "🎁 المفاجأة 🎉"
+];
+
+let index = 0;
+const prize = document.getElementById("prize");
+const title = document.getElementById("title");
+const activityBox = document.getElementById("activity");
+const nextBtn = document.getElementById("nextBtn");
+
+function startActivities(){
+  birthday.classList.add("hidden");
+  activityBox.classList.remove("hidden");
+  loadActivity();
+}
+
+function loadActivity(){
+  title.textContent = الفعالية ${index+1};
+  prize.textContent = activities[index];
+  nextBtn.classList.add("hidden");
+  resetScratch();
+}
+
+function nextActivity(){
+  index++;
+  if(index < activities.length){
+    loadActivity();
+  } else {
+    title.textContent = "🎂 خلصنا!";
+    prize.textContent = "كل عام وانت بخير يا bubu 💙";
+    document.getElementById("scratch").style.display="none";
+    nextBtn.style.display="none";
+  }
+}
+
+// Scratch
+const canvas = document.getElementById("scratch");
+const ctx = canvas.getContext("2d");
+
+function resetScratch(){
+  canvas.style.display="block";
+  ctx.globalCompositeOperation="source-over";
+  ctx.fillStyle="#7fb3d5";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#ffffff";
+  ctx.font="18px Arial";
+  ctx.textAlign="center";
+  ctx.fillText("اكشط هون 👀", canvas.width/2,70);
+}
+
+let draw=false;
+canvas.addEventListener("mousedown",()=>draw=true);
+canvas.addEventListener("mouseup",()=>{draw=false; nextBtn.classList.remove("hidden");});
+canvas.addEventListener("mousemove",e=>{
+  if(!draw)return;
+  const r=canvas.getBoundingClientRect();
+  ctx.globalCompositeOperation="destination-out";
+  ctx.beginPath();
+  ctx.arc(e.clientX-r.left,e.clientY-r.top,18,0,Math.PI*2);
+  ctx.fill();
+});
+
+canvas.addEventListener("touchmove",e=>{
+  e.preventDefault();
+  const r=canvas.getBoundingClientRect();
+  const t=e.touches[0];
+  ctx.globalCompositeOperation="destination-out";
+  ctx.beginPath();
+  ctx.arc(t.clientX-r.left,t.clientY-r.top,18,0,Math.PI*2);
+  ctx.fill();
+  nextBtn.classList.remove("hidden");
+});
+</script>
+
+</body>
+</html>
